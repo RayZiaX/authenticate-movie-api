@@ -1,16 +1,19 @@
-const { Sequelize } = require('sequelize')
+const { Sequelize, Model } = require('sequelize')
 const { Entities } = require('../Entities/index')
 
 class DbOption{
-    constructor({host = '', dialect = '', storage = '', mode = undefined}){
+    constructor({host = '', dialect = '', storage = '', mode = undefined, logging=false}){
         this.host = host
         this.dialect = dialect
         this.storage = storage
         this.mode = mode
+        this.logging = logging
     }
 
     toPrototype(){
-        let prototype = {}
+        let prototype = {
+            logging: this.logging
+        }
         if(this.host != ''){
             prototype.host = this.host
         }
@@ -34,10 +37,9 @@ class MovieAuthContext extends Sequelize{
     #usersRoles;
 
     constructor(dbName, userName, password, dbOptions = {}){
-        if(typeof(dbOptions) !== DbOption){
+        if(!(dbOptions instanceof DbOption)){
             throw new Error(`dbOption is not type ${typeof(DbOption)}`)
         }
-
         super(dbName,userName,password,dbOptions.toPrototype())
         this.#onModelCreating()
     }
@@ -63,13 +65,13 @@ class MovieAuthContext extends Sequelize{
     }
 
     #onModelConfiguring(){
-        this.#users.hasMany(this.roles,{
+        this.#users.belongsToMany(this.#roles,{
             as: "roles",
             through: "users_roles",
             foreignKey: "id_user",
             otherKey: "id_role"
         })
-        this.#roles.hasMany(this.users, {
+        this.#roles.belongsToMany(this.#users, {
             as: "users",
             through: "users_roles",
             foreignKey: "id_role",

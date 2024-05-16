@@ -3,7 +3,8 @@ const fs = require('fs')
 const sqlite = require('sqlite3')
 
 let options = {
-    dialect: process.env.DB_DIALECT
+    dialect: process.env.DB_DIALECT.toLocaleLowerCase(),
+    logging: process.env.DB_LOG.toLocaleLowerCase() === 'yes' && process.env.ENV.toLocaleLowerCase() === "dev"
 }
 
 let dbName = process.env.DB_NAME == undefined ? '' : process.env.DB_NAME
@@ -19,9 +20,6 @@ if(options.dialect.toLocaleLowerCase()){
         fs.mkdirSync(dirSqlite, {recursive: true});
     }
 }
-
-let dbOptions = new DbOption(options)
-
-const instance = new MovieAuthContext(dbName,dbUsername,dbPassword,dbOptions)
+const instance = new MovieAuthContext(dbName,dbUsername,dbPassword,new DbOption(options))
 
 module.exports = instance

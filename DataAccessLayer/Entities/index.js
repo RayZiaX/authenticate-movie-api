@@ -1,7 +1,7 @@
 module.exports = {
     Entities:{
-        User: require('./Role'),
-        Role: require('./User'),
+        User: require('./User'),
+        Role: require('./Role'),
         UserRole: require('./UserRole')
     }
 }

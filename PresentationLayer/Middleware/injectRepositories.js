@@ -4,6 +4,7 @@ const dbContextInstance = require('../../DataAccessLayer/Contexts/MovieAuthConte
 module.exports = async (req,res,next) => {
     try {
         await dbContextInstance.authenticate()
+        await dbContextInstance.sync()
         req.repositories = new Repositories(dbContextInstance)
         next()
     } catch (error) {

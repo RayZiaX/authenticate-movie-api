@@ -7,9 +7,9 @@ module.exports = (context) => {
         idUser:{
             type: DataTypes.UUIDV4,
             primaryKey: true,
-            autoIncrement:true,
+            autoIncrement:false,
             allowNull: false,
-            field: "id_User"
+            field: "id_user"
         },
         nameUser:{
             type:DataTypes.STRING,
@@ -38,4 +38,5 @@ module.exports = (context) => {
         createdAt: true,
         updatedAt: true
     })
+    ;
 }

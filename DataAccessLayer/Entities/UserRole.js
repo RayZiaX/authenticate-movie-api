@@ -27,4 +27,5 @@ module.exports = (context) => {
         createdAt: true,
         updatedAt: true
     })
+    
 }
