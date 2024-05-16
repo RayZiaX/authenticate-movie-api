@@ -1,5 +1,5 @@
 const { DataTypes, Model } = require('sequelize')
-
+const Role = require("./Role")
 class User extends Model{}
 
 module.exports = (context) => {

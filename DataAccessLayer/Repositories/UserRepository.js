@@ -6,11 +6,65 @@ class UserRepository extends BaseRepository{
         super(context,entity,"user")
     }
 
+    async createUserWithRolesAsync(value,idRoles){
+        let response = new ResponseRepository()
+        try {
+            let result = await this.createAsync(value,false)
+            if(result.success){
+                await Promise.all(idRoles.map(roleId => {
+                    return this.context.getUsersRoles().create({idUser: result.data.idUser,idRole:roleId})
+                }))
+                result = await this.getUserRolesbyPkAsync(result.data.idUser,false)
+
+                if(result.success){
+                    response.setData(result.data)
+                }else{
+                    response.getError().setErrorMessage(result.error.message,result.error.technicalMessage)
+                    response.getError().setStatusCode(result.error.statuscode)
+                }
+            }else{
+                response.getError().setErrorMessage(result.error.message,result.error.technicalMessage)
+                response.getError().setStatusCode(result.error.statuscode)
+            }
+        } catch (error) {
+            response = this._setServerError(response,`Une erreur a été rencontré durant la création de ${this.entityType}`,error)
+        }
+
+        return this._sendResponse(response)
+    }
+
+    async getUserRolesbyPkAsync(primaryKey,track = false){
+        let response = new ResponseRepository()
+        try {
+            let options= {
+                include: [
+                    {
+                        model: this.context.getRoles(),
+                        as: "roles",
+                        through: {
+                            attributes: []
+                        },
+                        attributes: ['idRole','nameRole']
+                    }
+                ]
+            }
+            let result = await this.getByPrimaryKeyAsync(primaryKey,options,track)
+            if(result.success){
+                response.setData(result.data)
+            }else{
+                response.getError().setErrorMessage(result.error.message,result.error.technicalMessage)
+                response.getError().setStatusCode(result.error.statuscode)
+            }
+        } catch (error) {
+            response = this._setServerError(response,`Une erreur a été rencontré durant la récupération de ${this.entityType}`,error);
+        }
+        return this._sendResponse(response)
+    }
+
     async updateUserAsync({firstname,lastname,login}, primaryKey, track=false){
         let response = new ResponseRepository()
         try {
-            console.log({firstname,lastname,login})
-            let oldEntity = await this.getByPrimaryKeyAsync(primaryKey,true)
+            let oldEntity = await this.getByPrimaryKeyAsync(primaryKey,undefined,true)
             if(oldEntity.success){
                 oldEntity = oldEntity.data
                 oldEntity.nameUser = firstname
@@ -18,8 +72,8 @@ class UserRepository extends BaseRepository{
                 oldEntity.loginUser = login
 
                 await oldEntity.save()
-
-                let changeEntity = await this.getByPrimaryKeyAsync(primaryKey,false)
+                
+                let changeEntity = await this.getUserRolesbyPkAsync(primaryKey,track)
                 if(changeEntity.success){
                     response.setData(changeEntity.data)
                 }else{
@@ -31,8 +85,7 @@ class UserRepository extends BaseRepository{
                 response.getError().setStatusCode(404)
             }
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la suppression de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError(response,`Une erreur a été rencontré durant la modification de ${this.entityType}`, error)
         }
 
         return this._sendResponse(response)

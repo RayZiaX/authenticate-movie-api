@@ -9,9 +9,10 @@ class UserController extends BaseController{
         let data = {
             firstname: req.body.firstname,
             name: req.body.name,
-            login: req.body.login
+            login: req.body.login,
+            roles: req.body.idRoles
         }
-        let serviceResponse = await this._service.createUserAsync(req.repositories.getUserRepository(),data)
+        let serviceResponse = await this._service.createUserAsync(req.repositories,data)
         return res.status(serviceResponse.statuscode).json(serviceResponse)
     }
 

@@ -1,6 +1,6 @@
 const { v4 } = require('uuid');
 const BoResponse = require('./BoResponses/BoResponse');
-
+const bcrypt = require('bcryptjs')
 class BoUser{
     #firstname;
     #name;
@@ -92,21 +92,22 @@ class BoUser{
     /**
      * Méthode qui permet de générer un mot de passe à l'utilisateur 
      */
-    #generatePassword(){
-        return v4().replace('-','').substring(0,16)
+    async #generatePasswordAsync(){
+        let clearPwd = v4().replace('-','').substring(0,12)
+        return await bcrypt.hash(clearPwd,process.env.HASH_SALT)
     }
 
     #generateUuid(){
         return v4()
     }
 
-    toCreateUser(){
+    async toCreateUser(){
         return {
             idUser: this.#generateUuid(),
             firstnameUser:this.#firstname,
             nameUser:this.#name,
             loginUser:this.#login,
-            passwordUser:this.#generatePassword(),
+            passwordUser: await this.#generatePasswordAsync(),
         }
     }
 

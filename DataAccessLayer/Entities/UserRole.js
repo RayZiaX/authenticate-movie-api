@@ -4,20 +4,22 @@ class UserRole extends Model{}
 
 module.exports = (context) => {
     return UserRole.init({
-        id_user: {
+        idUser: {
             type: DataTypes.UUIDV4,
             references:{
                 model: "user",
                 key: "id_user"
             },
+            field:"id_user",
             primaryKey: true
         },
-        id_role:{
+        idRole:{
             type: DataTypes.INTEGER,
             references:{
                 model: "role",
                 key:"id_role"
             },
+            field:"id_role",
             primaryKey: true
         }
     },{
