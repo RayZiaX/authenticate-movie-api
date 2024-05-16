@@ -14,16 +14,19 @@ module.exports = (context) => {
         nameUser:{
             type:DataTypes.STRING,
             allowNull: false,
+            unique:true,
             field: "name_user"
         },
         firstnameUser:{
             type: DataTypes.STRING,
             allowNull: false,
+            unique:true,
             field: "firstname_user"
         },
         loginUser:{
             type: DataTypes.STRING,
             allowNull: false,
+            unique:true,
             field: "login_user"
         },
         passwordUser:{

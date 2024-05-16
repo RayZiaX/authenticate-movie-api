@@ -92,9 +92,8 @@ class BoUser{
     /**
      * Méthode qui permet de générer un mot de passe à l'utilisateur 
      */
-    async #generatePasswordAsync(){
-        let clearPwd = v4().replace('-','').substring(0,12)
-        return await bcrypt.hash(clearPwd,process.env.HASH_SALT)
+    #generatePassword(){
+        return v4().replace('-','').substring(0,12) 
     }
 
     #generateUuid(){
@@ -102,12 +101,14 @@ class BoUser{
     }
 
     async toCreateUser(){
+        let password = this.#generatePassword()
         return {
             idUser: this.#generateUuid(),
             firstnameUser:this.#firstname,
             nameUser:this.#name,
             loginUser:this.#login,
-            passwordUser: await this.#generatePasswordAsync(),
+            passwordUser: await bcrypt.hash(password,process.env.HASH_SALT.length),
+            clearPassword: password
         }
     }
 
@@ -187,6 +188,11 @@ class BoUser{
         }
         return reponse
     }
+
+    static async compareHash(str,hash){
+        return await bcrypt.compare(str,hash)
+    }
+
     //#endregion
 }
 

@@ -14,21 +14,23 @@ class UserServices{
         if(boResponse.success()){
             let repoRolesResponse = await repositories.getRoleRepository().existsRangeByIdsAsync(data.roles)
             if(repoRolesResponse.success){
-                let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(bo.toCreateUser(),data.roles)
+                let protoCreateUser = await bo.toCreateUser()
+                let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(protoCreateUser,data.roles)
                 if(repoUserResponse.success){
+                    repoUserResponse.data.passwordUser = protoCreateUser.clearPassword
                     this._response.setData(repoUserResponse.data)
                 }else{
                     this._response.getError().setErrorMessage(repoUserResponse.error.message, repoUserResponse.error.technicalMessage)
                     this._response.getError().setStatusCode(repoUserResponse.error.statuscode)
                     if(process.env.ENV.toLocaleLowerCase() == "dev"){
-                        console.log(repoUserResponse.error)
+                        console.error(repoUserResponse.error)
                     }
                 }
             }else{
                 this._response.getError().setErrorMessage(repoRolesResponse.error.message, repoRolesResponse.error.technicalMessage)
                 this._response.getError().setStatusCode(repoRolesResponse.error.statuscode)
                 if(process.env.ENV.toLocaleLowerCase() == "dev"){
-                    console.log(repoRolesResponse.error)
+                    console.error(repoRolesResponse.error)
                 }
             }
         }else{
@@ -51,7 +53,6 @@ class UserServices{
         if(repoResponse.success){
             this._response.setData(repoResponse.data)
         }else{
-            console.log(repoResponse)
             this._response.getError().setErrorMessage(repoResponse.error.message)
             this._response.getError().setStatusCode(repoResponse.statuscode)
         }
@@ -71,9 +72,8 @@ class UserServices{
                 this._response.getError().setErrorMessage(repoResponse.error.message, repoResponse.error.technicalMessage)
                 this._response.getError().setStatusCode(repoResponse.error.statuscode)
                 if(process.env.ENV.toLocaleLowerCase() == "dev"){
-                    console.log()
-                    console.log("Erreur dans l'update")
-                    console.log(repoResponse.error)
+                    console.error("Erreur dans l'update")
+                    console.error(repoResponse.error)
                 }
             }
 
