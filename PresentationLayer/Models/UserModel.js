@@ -5,12 +5,14 @@ class UserModel extends BaseModel{
     #firstname
     #lastname
     #login
-    constructor({idUser, firstnameUser,lastnameUser,loginUser,createdAt,updatedAt}){
+    #roles
+    constructor({idUser, firstnameUser,lastnameUser,loginUser,roles,createdAt,updatedAt}){
         super({createdAt: createdAt, updatedAt: updatedAt})
         this.#idUser = idUser
         this.#firstname = firstnameUser
         this.#lastname = lastnameUser
         this.#login = loginUser
+        this.#roles = roles
     }
 
     toPrototype(){

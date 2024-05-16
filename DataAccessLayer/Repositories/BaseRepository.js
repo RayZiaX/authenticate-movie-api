@@ -17,10 +17,10 @@ class BaseRepository{
      * @param {indique si l'orm doit traquer l'entité ou pas} track 
      * @returns une réponse de l'action du répository
      */
-    async getByPrimaryKeyAsync(primaryKey, track = false){
+    async getByPrimaryKeyAsync(primaryKey, options,track = false){
         let response = new ResponseRepository()
         try {
-            let data = await this.entity.findByPk(primaryKey)
+            let data = await this.entity.findByPk(primaryKey,options)
             if(data == null){
                 response.getError().setErrorMessage(`aucun ${this.entityType} n'a été trouvé`,`Message technique: aucun ${this.entityType} n'a été trouvé`)
                 response.getError().setStatusCode(404)
@@ -31,8 +31,7 @@ class BaseRepository{
                 response.setData(data)
             }
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la récupération de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError(response,`Une erreur a été rencontré durant la récupération de ${this.entityType}`, error)
         }
         return this._sendResponse(response)
     }
@@ -52,8 +51,7 @@ class BaseRepository{
             }
             response.setData(entityCreate)
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la création de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError(response,`Une erreur a été rencontré durant la création de ${this.entityType}`, error)
         }
         return this._sendResponse(response)
     }
@@ -74,8 +72,7 @@ class BaseRepository{
                 response.getError().setStatusCode(404)
             }
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la suppression de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError(response,`Une erreur a été rencontré durant la suppression de ${this.entityType}`, error)
         }
         return this._sendResponse(response)
     }
@@ -103,8 +100,7 @@ class BaseRepository{
                 response.getError().setStatusCode(404)
             }
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la modification de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError
         }
         return this._sendResponse(response)
     }
@@ -121,8 +117,7 @@ class BaseRepository{
                 response.getError().setStatusCode(404)
             }
         } catch (error) {
-            response.getError().setErrorMessage(`Une erreur a été rencontré durant la vérification de l'existance de ${this.entityType}`, error)
-            response.getError().setStatusCode(500)
+            response = this._setServerError(response,`Une erreur a été rencontré durant la vérification de l'existance de ${this.entityType}`, error)
         }
 
         return this._sendResponse(response)
@@ -130,6 +125,12 @@ class BaseRepository{
 
     _sendResponse(response){
         return response.toPrototype()
+    }
+
+    _setServerError(response,message,error){
+        response.getError().setErrorMessage(message, error)
+        response.getError().setStatusCode(500)
+        return response
     }
 }
 

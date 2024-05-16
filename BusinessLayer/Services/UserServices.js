@@ -8,18 +8,27 @@ class UserServices{
         this._response = new ServiceResponse()
     }
 
-    async createUserAsync(userRepo, data){
+    async createUserAsync(repositories, data){
         let bo = new BoUser(data)
         let boResponse = bo.checkDatasToInsert()
         if(boResponse.success()){
-            let repoResponse = await userRepo.createAsync(bo.toCreateUser(),false)
-            if(repoResponse.success){
-                this._response.setData(repoResponse.data)
+            let repoRolesResponse = await repositories.getRoleRepository().existsRangeByIdsAsync(data.roles)
+            if(repoRolesResponse.success){
+                let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(bo.toCreateUser(),data.roles)
+                if(repoUserResponse.success){
+                    this._response.setData(repoUserResponse.data)
+                }else{
+                    this._response.getError().setErrorMessage(repoUserResponse.error.message, repoUserResponse.error.technicalMessage)
+                    this._response.getError().setStatusCode(repoUserResponse.error.statuscode)
+                    if(process.env.ENV.toLocaleLowerCase() == "dev"){
+                        console.log(repoUserResponse.error)
+                    }
+                }
             }else{
-                this._response.getError().setErrorMessage(repoResponse.error.message, repoResponse.error.technicalMessage)
-                this._response.getError().setStatusCode(repoResponse.error.statuscode)
+                this._response.getError().setErrorMessage(repoRolesResponse.error.message, repoRolesResponse.error.technicalMessage)
+                this._response.getError().setStatusCode(repoRolesResponse.error.statuscode)
                 if(process.env.ENV.toLocaleLowerCase() == "dev"){
-                    console.log(repoResponse.error)
+                    console.log(repoRolesResponse.error)
                 }
             }
         }else{
@@ -38,10 +47,11 @@ class UserServices{
             return this._response.toPrototype()
         }
 
-        let repoResponse = await userRepo.getByPrimaryKeyAsync(id,false)
+        let repoResponse = await userRepo.getUserRolesbyPkAsync(id,false)
         if(repoResponse.success){
             this._response.setData(repoResponse.data)
         }else{
+            console.log(repoResponse)
             this._response.getError().setErrorMessage(repoResponse.error.message)
             this._response.getError().setStatusCode(repoResponse.statuscode)
         }
