@@ -10,6 +10,7 @@ const contextInstance = require('./DataAccessLayer/Contexts/MovieAuthContextInst
 app.use(express.json())
 app.use(middlewares.injectRepositories)
 app.use(baseRouteApi,routes.userRoutes)
+app.use(baseRouteApi,routes.authRoutes)
 
 contextInstance.sync()
 .then(() => {

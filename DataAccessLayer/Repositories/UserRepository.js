@@ -61,6 +61,29 @@ class UserRepository extends BaseRepository{
         return this._sendResponse(response)
     }
 
+    async getUserRolesByCriteriaAsync(criteria, track = false){
+        let response = new ResponseRepository()
+        try {
+            let result = await this.entity.findOne({where:criteria})
+            if(result != null){
+                result = await this.getUserRolesbyPkAsync(result.idUser,track)
+                if(result.success){
+                    response.setData(result.data)
+                }else{
+                    response.getError().setErrorMessage(result.error.message,result.error.technicalMessage)
+                    response.getError().setStatusCode(result.error.statuscode)
+                }
+            }else{
+                response.getError().setErrorMessage(`aucune données n'a été récupérer`,"not found")
+                response.getError().setStatusCode(404)
+            }
+        } catch (error) {
+            response = this._setServerError(response,`Une erreur a été rencontré durant la récupération de ${this.entityType}`,error);
+        }
+
+        return this._sendResponse(response)
+    }
+
     async updateUserAsync({firstname,lastname,login}, primaryKey, track=false){
         let response = new ResponseRepository()
         try {

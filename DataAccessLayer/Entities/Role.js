@@ -14,6 +14,7 @@ module.exports = (context) => {
         nameRole:{
             type: DataTypes.STRING,
             allowNull: false,
+            unique: false,
             field: "name_role"
         },
         actif:{
