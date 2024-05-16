@@ -33,6 +33,11 @@ module.exports = (context) => {
             type: DataTypes.STRING,
             allowNull: false,
             field: "pwd_user"
+        },
+        status:{
+            type: DataTypes.STRING,
+            allowNull: false,
+            field: "status_user"
         }
     },{
         sequelize: context,

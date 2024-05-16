@@ -10,7 +10,8 @@ class UserController extends BaseController{
             firstname: req.body.firstname,
             name: req.body.name,
             login: req.body.login,
-            roles: req.body.idRoles
+            roles: req.body.idRoles,
+            status: req.body.status
         }
         let serviceResponse = await this._service.createUserAsync(req.repositories,data)
         return res.status(serviceResponse.statuscode).json(serviceResponse)

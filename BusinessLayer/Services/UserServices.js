@@ -41,7 +41,23 @@ class UserServices{
         return this._response.toPrototype()
     }
 
-    async getAccountByIdAsync(userRepo, id){
+    async getAccountByIdAsync(userRepo, id,client){
+        if(client.roles.isGest){
+            this._response.getError().setErrorMessage("Aucun compte trouvé", "l'utilsateur connecté n'est pas un utilisateur ou un admin")
+            this._response.getError().setStatusCode(400)
+            return this._response.toPrototype()
+        }
+
+        if(client.id !== id && client.roles.isUser && (!client.roles.isAdmin && !client.roles.isGest)){
+            this._response.getError().setErrorMessage("Aucun compte trouvé", "l'utilsateur connecté n'est pas propriétaire du compte")
+            this._response.getError().setStatusCode(403)
+            return this._response.toPrototype()
+        }
+        
+        if(id.toLowerCase() === "" && client.roles.isUser){
+            id = client.id
+        }
+
         let boResponse = BoUser.checkId()
         if(!boResponse.success){
             this._response.getError().setErrorMessage(boResponse.error.message, boResponse.error.technicalMessage)

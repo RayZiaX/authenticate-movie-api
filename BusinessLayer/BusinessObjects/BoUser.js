@@ -7,12 +7,21 @@ class BoUser{
     #login;
     #password;
     #id;
-    constructor({idUser ="", firstname = "", name = "", login = "", password = ""}){
+    #status;
+    #roles
+
+    constructor({idUser ="", firstname = "", name = "", login = "", password = "", status="open", roles = null}){
         this.#firstname = firstname
         this.#name = name
         this.#login = login
         this.#password = password
         this.#id = idUser
+        this.#status = status
+        this.#roles = roles
+    }
+//#region Méthodes de vérification
+    checkStatus(){
+        return BoUser.checkStatus(this.#status)
     }
 
     checkDatasToInsert(){
@@ -29,6 +38,16 @@ class BoUser{
         }
 
         if(!this.checkLogin().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkStatus().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkRoles().success()){
             response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
             response.getError().setStatusCode(400)
         }
@@ -89,6 +108,12 @@ class BoUser{
         return BoUser.checkId(this.#id)
     }
 
+    checkRoles(){
+        return BoUser.checkRoles(this.#roles)
+    }
+
+//#endregion
+
     /**
      * Méthode qui permet de générer un mot de passe à l'utilisateur 
      */
@@ -108,7 +133,8 @@ class BoUser{
             nameUser:this.#name,
             loginUser:this.#login,
             passwordUser: await bcrypt.hash(password,process.env.HASH_SALT.length),
-            clearPassword: password
+            clearPassword: password,
+            status: this.#status ? this.#status : "open"
         }
     }
 
@@ -170,23 +196,63 @@ class BoUser{
     }
 
     static checkId(id){
-        let reponse = new BoResponse()
+        let response = new BoResponse()
         
         if(id == null || id == undefined){
-            reponse.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant du compte ne peux pas être null ou undefined")
-            reponse.getError().setStatusCode(401)
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant du compte ne peux pas être null ou undefined")
+            response.getError().setStatusCode(401)
         }
 
         if(typeof(id) != 'string'){
-            reponse.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
-            reponse.getError().setStatusCode(401)
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
+            response.getError().setStatusCode(401)
         }
 
         if(id === ""){
-            reponse.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant ne peux pas être vide")
-            reponse.getError().setStatusCode(401)
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant ne peux pas être vide")
+            response.getError().setStatusCode(401)
         }
-        return reponse
+        return response
+    }
+
+    static checkStatus(status){
+        let response = new BoResponse()
+        if(status == undefined || status == null){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant du compte ne peux pas être null ou undefined")
+            response.getError().setStatusCode(401)
+        }
+
+        if(typeof(status) != 'string'){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
+            response.getError().setStatusCode(401)
+        }
+
+        if(status.toLowerCase() !== 'open' && status.toLowerCase() !== 'closed'){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
+            response.getError().setStatusCode(401)
+        }
+
+        return response
+    }
+
+    static checkRoles(roles){
+        let response = new BoResponse()
+        if(roles == undefined || roles == null){
+            response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "un utilisateur doit avoir au moins le rôle 'Gest'")
+            response.getError().setStatusCode(401)
+        }
+
+        if(!Array.isArray(roles)){
+            response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "la variable 'roles' doit être de type array")
+            response.getError().setStatusCode(401)
+        }
+
+        if(roles.find((role) => role.idRole == 1) != undefined && roles.find((role) => role.idRole == 2) == undefined){
+            response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "le rôle administrateur doit avoir le rôle 'utilisateur'")
+            response.getError().setStatusCode(401)
+        }
+
+        return response
     }
 
     static async compareHash(str,hash){
