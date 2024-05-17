@@ -58,22 +58,32 @@ class BoUser{
     checkDatas(){
         let response = new BoResponse();
         if(!this.checkId().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","l'identifiant n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkName().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le nom n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkFirstname().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkLogin().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le login n'est pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkStatus().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le status n'est pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkRoles().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","les roles n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
@@ -143,7 +153,9 @@ class BoUser{
            id: this.#id,
            firstname: this.#firstname,
            lastname: this.#name,
-           login: this.#login
+           login: this.#login,
+           status: this.#status,
+           roles: this.#roles
         }
 
         return prototype
@@ -161,6 +173,7 @@ class BoUser{
         if(name == null || name == undefined || typeof(name) !== 'string' || name == ""){
             response.getError().setErrorMessage("le nom du compte n'est pas au bon format")
             response.getError().setStatusCode(400)
+            return response
         }
         return response
     }
@@ -175,9 +188,9 @@ class BoUser{
         if(firstname == null || firstname == undefined|| typeof(firstname) !== 'string'  || firstname == ""){
             response.getError().setErrorMessage("le prénom du compte n'est pas valide")
             response.getError().setStatusCode(400)
+            return response 
         }
-
-        return response 
+        return response
     }
 
     /**
@@ -190,6 +203,7 @@ class BoUser{
         if(login == null || login == undefined || typeof(login) !== 'string' || login == ""){
             response.getError().setErrorMessage("le login n'est pas au bon format")
             response.getError().setStatusCode(400)
+            return response
         }
 
         return response 
@@ -201,16 +215,19 @@ class BoUser{
         if(id == null || id == undefined){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant du compte ne peux pas être null ou undefined")
             response.getError().setStatusCode(401)
+            return response
         }
 
         if(typeof(id) != 'string'){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
             response.getError().setStatusCode(401)
+            return response
         }
 
         if(id === ""){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant ne peux pas être vide")
             response.getError().setStatusCode(401)
+            return response
         }
         return response
     }
@@ -220,38 +237,42 @@ class BoUser{
         if(status == undefined || status == null){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "l'identifiant du compte ne peux pas être null ou undefined")
             response.getError().setStatusCode(401)
+            return response
         }
 
         if(typeof(status) != 'string'){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
             response.getError().setStatusCode(401)
+            return response
         }
 
         if(status.toLowerCase() !== 'open' && status.toLowerCase() !== 'closed'){
             response.getError().setErrorMessage("Une erreur à été rencontré durant la récupération du compte", "le type de l'identifiant du compte n'est pas conforme")
             response.getError().setStatusCode(401)
+            return response
         }
-
         return response
     }
 
-    static checkRoles(roles){
+    static checkRoles(idRoles){
         let response = new BoResponse()
-        if(roles == undefined || roles == null){
+        if(idRoles == undefined || idRoles == null){
             response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "un utilisateur doit avoir au moins le rôle 'Gest'")
             response.getError().setStatusCode(401)
+            return response
         }
 
-        if(!Array.isArray(roles)){
+        if(!Array.isArray(idRoles)){
             response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "la variable 'roles' doit être de type array")
             response.getError().setStatusCode(401)
+            return response
         }
 
-        if(roles.find((role) => role.idRole == 1) != undefined && roles.find((role) => role.idRole == 2) == undefined){
+        if(idRoles.find((idRole) => idRole == 1) != undefined && idRoles.find((idRole) => idRole == 2) == undefined){
             response.getError().setErrorMessage("Une erreur à été rencontré la vérification des roles", "le rôle administrateur doit avoir le rôle 'utilisateur'")
             response.getError().setStatusCode(401)
+            return response
         }
-
         return response
     }
 
