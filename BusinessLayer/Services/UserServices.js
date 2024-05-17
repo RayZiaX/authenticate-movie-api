@@ -18,7 +18,6 @@ class UserServices{
                 let protoCreateUser = await bo.toCreateUser()
                 let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(protoCreateUser,data.roles)
                 if(repoUserResponse.success){
-                    repoUserResponse.data.passwordUser = protoCreateUser.clearPassword
                     this._response.setData(repoUserResponse.data)
                 }else{
                     this._response.getError().setErrorMessage(repoUserResponse.error.message, repoUserResponse.error.technicalMessage)
@@ -35,6 +34,9 @@ class UserServices{
                 }
             }
         }else{
+            if(process.env.ENV.toLocaleLowerCase() == "dev"){
+                console.error(boResponse)
+            }
             this._response.getError().setErrorMessage()
             this._response.getError().setStatusCode(boResponse._getStatusCode())
         }
@@ -94,8 +96,9 @@ class UserServices{
 
         if(id.toLowerCase() === "me" && client.roles.isUser){
             data.idUser = client.id
+            console.log(data.idUser)
         }
-        
+        console.log(data)
         let bo = new BoUser(data)
         let boResponse = bo.checkDatas()
         if(boResponse.success()){
@@ -115,7 +118,11 @@ class UserServices{
             }
 
         }else{
-            this._response.getError().setErrorMessage()
+            if(process.env.ENV.toLocaleLowerCase() == "dev"){
+                console.error("Erreur de la vérification")
+                console.error(boResponse.toPrototype())
+            }
+            this._response.getError().setErrorMessage(boResponse.toPrototype().error.message)
             this._response.getError().setStatusCode(boResponse._getStatusCode())
         }
         

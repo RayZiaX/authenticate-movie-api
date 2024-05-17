@@ -20,35 +20,37 @@ class BoUser{
         this.#roles = roles
     }
 //#region Méthodes de vérification
-    checkStatus(){
-        return BoUser.checkStatus(this.#status)
-    }
 
     checkDatasToInsert(){
         let response = new BoResponse();
 
         if(!this.checkName().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","Le nom n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkFirstname().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkLogin().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le login n'est pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkPassword().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le mot de passe n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkStatus().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le status n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkRoles().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme")
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","les roles ne sont pas conforme")
             response.getError().setStatusCode(400)
         }
 
@@ -68,6 +70,11 @@ class BoUser{
         }
 
         if(!this.checkFirstname().success()){
+            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
+            response.getError().setStatusCode(400)
+        }
+
+        if(!this.checkPassword().success()){
             response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
             response.getError().setStatusCode(400)
         }
@@ -98,6 +105,10 @@ class BoUser{
         return BoUser.checkName(this.#name)
     }
     
+    checkStatus(){
+        return BoUser.checkStatus(this.#status)
+    }
+
     /**
      * Méthode qui permet d'appliquer les règles métier de conformité pour l'objet métier à sa propriété firstname
      * @returns une réponse de type BoResponse qui valide ou non la vérification
@@ -118,6 +129,10 @@ class BoUser{
         return BoUser.checkId(this.#id)
     }
 
+    checkPassword(){
+        return BoUser.checkPassword(this.#password)
+    }
+
     checkRoles(){
         return BoUser.checkRoles(this.#roles)
     }
@@ -136,14 +151,12 @@ class BoUser{
     }
 
     async toCreateUser(){
-        let password = this.#generatePassword()
         return {
             idUser: this.#generateUuid(),
             firstnameUser:this.#firstname,
             nameUser:this.#name,
             loginUser:this.#login,
-            passwordUser: await bcrypt.hash(password,process.env.HASH_SALT.length),
-            clearPassword: password,
+            passwordUser: this.#password,
             status: this.#status ? this.#status : "open"
         }
     }
@@ -207,6 +220,29 @@ class BoUser{
         }
 
         return response 
+    }
+
+    static checkPassword(password){
+        let response = new BoResponse()
+        
+        if(password == null || password == undefined){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la vérification du mots de passe", "le mot de passe du compte ne peux pas être null ou undefined")
+            response.getError().setStatusCode(401)
+            return response
+        }
+
+        if(typeof(password) != 'string'){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la vérification du mots de passe", "le type du mot de passe du compte n'est pas conforme")
+            response.getError().setStatusCode(401)
+            return response
+        }
+
+        if(password === ""){
+            response.getError().setErrorMessage("Une erreur à été rencontré durant la vérification du mots de passe", "le mot de passe ne peux pas être vide")
+            response.getError().setStatusCode(401)
+            return response
+        }
+        return response
     }
 
     static checkId(id){

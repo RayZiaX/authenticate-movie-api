@@ -11,7 +11,8 @@ class UserController extends BaseController{
             name: req.body.name,
             login: req.body.login,
             roles: req.body.idRoles,
-            status: req.body.status
+            status: req.body.status,
+            password: req.body.password
         }
         let serviceResponse = await this._service.createUserAsync(req.repositories,data)
         return res.status(serviceResponse.statuscode).json(serviceResponse)
@@ -29,6 +30,7 @@ class UserController extends BaseController{
             idUser: req.params.userId,
             firstname: req.body.firstname,
             name: req.body.name,
+            password:req.body.password,
             login: req.body.login,
             status: req.body.status,
             roles: req.body.roles

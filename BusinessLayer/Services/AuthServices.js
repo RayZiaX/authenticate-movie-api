@@ -21,25 +21,18 @@ class AuthServices{
             return this._response.toPrototype()
         }
 
-        let repoResponse = await userRepo.getUserRolesByCriteriaAsync({loginUser:login},false)
+        let repoResponse = await userRepo.getUserRolesByCriteriaAsync({loginUser:login,passwordUser:password},false)
         if(repoResponse.success){
-            if(await BoUser.compareHash(password,repoResponse.data.passwordUser) || repoResponse.data.passwordUser === 'root'){
-                this._response.setData(this.#generateTokenAsync({idUser: repoResponse.data.idUser, roles: repoResponse.data.roles}))
-                return this._response.toPrototype()
-            }else{
-                if(process.env.ENV.toLocaleLowerCase() == "dev"){
-                    console.error("le mot de passe de correspond pas")
-                    console.error(repoResponse)
-                }
-                this._response.getError().setErrorMessage('Login ou mots de passe non valide','le login est null ou undefined')
-                this._response.getError().setStatusCode(401)
-                return this._response.toPrototype()
-            }
+            this._response.setData(this.#generateTokenAsync({idUser: repoResponse.data.idUser, roles: repoResponse.data.roles}))
+            return this._response.toPrototype()
         }else{
             if(process.env.ENV.toLocaleLowerCase() == "dev"){
                 console.error("erreur récupération de l'utilisateur")
                 console.error(repoResponse)
             }
+            this._response.getError().setErrorMessage('Login ou mots de passe non valide','le login est null ou undefined')
+            this._response.getError().setStatusCode(401)
+            return this._response.toPrototype()
         }
     }
 
