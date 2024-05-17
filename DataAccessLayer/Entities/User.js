@@ -9,30 +9,33 @@ module.exports = (context) => {
             primaryKey: true,
             autoIncrement:false,
             allowNull: false,
+            unique:true,
             field: "id_user"
         },
         nameUser:{
             type:DataTypes.STRING,
             allowNull: false,
-            unique:true,
             field: "name_user"
         },
         firstnameUser:{
             type: DataTypes.STRING,
             allowNull: false,
-            unique:true,
             field: "firstname_user"
         },
         loginUser:{
             type: DataTypes.STRING,
             allowNull: false,
-            unique:true,
             field: "login_user"
         },
         passwordUser:{
             type: DataTypes.STRING,
             allowNull: false,
             field: "pwd_user"
+        },
+        status:{
+            type: DataTypes.STRING,
+            allowNull: false,
+            field: "status_user"
         }
     },{
         sequelize: context,

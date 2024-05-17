@@ -1,7 +1,8 @@
 const {MovieAuthContext, DbOption} = require('./MovieAuthContext')
+const { v4 } = require('uuid');
 const fs = require('fs')
 const sqlite = require('sqlite3')
-let canInjectRoles = false
+let canInjectDatas = false
 let options = {
     dialect: process.env.DB_DIALECT.toLocaleLowerCase(),
     logging: process.env.DB_LOG.toLocaleLowerCase() === 'yes' && process.env.ENV.toLocaleLowerCase() === "dev"
@@ -18,18 +19,24 @@ if(options.dialect.toLocaleLowerCase()){
     // création du dossier pour Sqlite
     if(!fs.existsSync(dirSqlite)){
         fs.mkdirSync(dirSqlite, {recursive: true});
-        canInjectRoles = true
+        canInjectDatas = true
     }
 }
 const instance = new MovieAuthContext(dbName,dbUsername,dbPassword,new DbOption(options))
 
 instance.sync()
-.then(() => {
-    if(canInjectRoles){
-        instance.getRoles().bulkCreate([
+.then(async () => {
+    if(canInjectDatas){
+        let idUser = v4()
+        await instance.getRoles().bulkCreate([
             {nameRole:"Admin",actif:true},
             {nameRole:"User",actif:true},
             {nameRole:"Gest",actif:true},
+        ])
+        await instance.getUsers().create({idUser:idUser,nameUser:'root',firstnameUser:'root',loginUser:'root',passwordUser:'root',status:'open'})
+        await instance.getUsersRoles().bulkCreate([
+            {idUser:idUser,idRole:2},
+            {idUser:idUser,idRole:1},
         ])
     }
 })

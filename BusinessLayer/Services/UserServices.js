@@ -9,6 +9,7 @@ class UserServices{
     }
 
     async createUserAsync(repositories, data){
+        this._response = new ServiceResponse()
         let bo = new BoUser(data)
         let boResponse = bo.checkDatasToInsert()
         if(boResponse.success()){
@@ -17,7 +18,6 @@ class UserServices{
                 let protoCreateUser = await bo.toCreateUser()
                 let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(protoCreateUser,data.roles)
                 if(repoUserResponse.success){
-                    repoUserResponse.data.passwordUser = protoCreateUser.clearPassword
                     this._response.setData(repoUserResponse.data)
                 }else{
                     this._response.getError().setErrorMessage(repoUserResponse.error.message, repoUserResponse.error.technicalMessage)
@@ -34,6 +34,9 @@ class UserServices{
                 }
             }
         }else{
+            if(process.env.ENV.toLocaleLowerCase() == "dev"){
+                console.error(boResponse)
+            }
             this._response.getError().setErrorMessage()
             this._response.getError().setStatusCode(boResponse._getStatusCode())
         }
@@ -41,7 +44,23 @@ class UserServices{
         return this._response.toPrototype()
     }
 
-    async getAccountByIdAsync(userRepo, id){
+    async getAccountByIdAsync(userRepo, id,client){
+        this._response = new ServiceResponse()
+        if(client.roles.isGest){
+            this._response.getError().setErrorMessage("Aucun compte trouvé", "l'utilsateur connecté n'est pas un utilisateur ou un admin")
+            this._response.getError().setStatusCode(400)
+            return this._response.toPrototype()
+        }
+        if((client.id !== id && id !== "me") && client.roles.isUser && (!client.roles.isAdmin && !client.roles.isGest)){
+            this._response.getError().setErrorMessage("Aucun compte trouvé", "l'utilsateur connecté n'est pas propriétaire du compte")
+            this._response.getError().setStatusCode(403)
+            return this._response.toPrototype()
+        }
+
+        if(id.toLowerCase() === "me" && client.roles.isUser){
+            id = client.id
+        }
+
         let boResponse = BoUser.checkId()
         if(!boResponse.success){
             this._response.getError().setErrorMessage(boResponse.error.message, boResponse.error.technicalMessage)
@@ -60,12 +79,33 @@ class UserServices{
         return this._response.toPrototype()
     }
 
-    async updateAccountByIdAsync(userRepo, data){
+    async updateAccountByIdAsync(userRepo, data,id, client){
+        this._response = new ServiceResponse()
+        let changeRoles = false
+        if(client == undefined || client.roles.isGest){
+            this._response.getError().setErrorMessage("Vous devez êtres connecté", "l'utilisateur n'est pas authentifier ou n'a pas les droits")
+            this._response.getError().setStatusCode(403)
+            return this._response.toPrototype()
+        }
+        
+        if((client.id !== id && id !== "me") && client.roles.isUser && (!client.roles.isAdmin && !client.roles.isGest)){
+            this._response.getError().setErrorMessage("Aucun compte trouvé", "l'utilsateur connecté n'est pas propriétaire du compte")
+            this._response.getError().setStatusCode(403)
+            return this._response.toPrototype()
+        }
+
+        if(id.toLowerCase() === "me" && client.roles.isUser){
+            data.idUser = client.id
+            console.log(data.idUser)
+        }
+        console.log(data)
         let bo = new BoUser(data)
         let boResponse = bo.checkDatas()
         if(boResponse.success()){
             let protoBo = bo.toPrototype()
-            let repoResponse = await userRepo.updateUserAsync(protoBo,protoBo.id,false)
+            changeRoles = client.roles.isAdmin
+
+            let repoResponse = await userRepo.updateUserAsync(protoBo,protoBo.roles,protoBo.id,changeRoles,false)
             if(repoResponse.success){
                 this._response.setData(repoResponse.data)
             }else{
@@ -78,7 +118,11 @@ class UserServices{
             }
 
         }else{
-            this._response.getError().setErrorMessage()
+            if(process.env.ENV.toLocaleLowerCase() == "dev"){
+                console.error("Erreur de la vérification")
+                console.error(boResponse.toPrototype())
+            }
+            this._response.getError().setErrorMessage(boResponse.toPrototype().error.message)
             this._response.getError().setStatusCode(boResponse._getStatusCode())
         }
         

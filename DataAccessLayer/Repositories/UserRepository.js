@@ -84,7 +84,7 @@ class UserRepository extends BaseRepository{
         return this._sendResponse(response)
     }
 
-    async updateUserAsync({firstname,lastname,login}, primaryKey, track=false){
+    async updateUserAsync({firstname,lastname,login,status}, roles,primaryKey,changeRoles = false, track=false){
         let response = new ResponseRepository()
         try {
             let oldEntity = await this.getByPrimaryKeyAsync(primaryKey,undefined,true)
@@ -93,9 +93,18 @@ class UserRepository extends BaseRepository{
                 oldEntity.nameUser = firstname
                 oldEntity.firstnameUser = lastname
                 oldEntity.loginUser = login
+                oldEntity.status = status
 
                 await oldEntity.save()
                 
+                if(changeRoles && (roles != undefined && Array.isArray(roles))){
+                    await this.context.getUsersRoles().destroy({where: {idUser: primaryKey}})
+
+                    await Promise.all(roles.map(roleId => {
+                        return this.context.getUsersRoles().create({idUser: primaryKey,idRole: roleId})
+                    }))
+                }
+
                 let changeEntity = await this.getUserRolesbyPkAsync(primaryKey,track)
                 if(changeEntity.success){
                     response.setData(changeEntity.data)

@@ -10,7 +10,9 @@ class UserController extends BaseController{
             firstname: req.body.firstname,
             name: req.body.name,
             login: req.body.login,
-            roles: req.body.idRoles
+            roles: req.body.idRoles,
+            status: req.body.status,
+            password: req.body.password
         }
         let serviceResponse = await this._service.createUserAsync(req.repositories,data)
         return res.status(serviceResponse.statuscode).json(serviceResponse)
@@ -18,7 +20,7 @@ class UserController extends BaseController{
 
     async getAccountByIdAsync(req,res){
         let id = req.params.userId
-        let serviceResponse = await this._service.getAccountByIdAsync(req.repositories.getUserRepository(), id)
+        let serviceResponse = await this._service.getAccountByIdAsync(req.repositories.getUserRepository(), id,req.user)
 
         return res.status(serviceResponse.statuscode).json(serviceResponse)
     }
@@ -28,11 +30,14 @@ class UserController extends BaseController{
             idUser: req.params.userId,
             firstname: req.body.firstname,
             name: req.body.name,
-            login: req.body.login
+            password:req.body.password,
+            login: req.body.login,
+            status: req.body.status,
+            roles: req.body.roles
         }
 
-        let serviceResponse = await this._service.updateAccountByIdAsync(req.repositories.getUserRepository(),data)
-        let value ={}
+        let serviceResponse = await this._service.updateAccountByIdAsync(req.repositories.getUserRepository(),data,req.params.userId,req.user)
+        let value = {}
         
         if(serviceResponse.success){
             value = new UserModel(serviceResponse.data).toPrototype()
