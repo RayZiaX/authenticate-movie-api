@@ -1,46 +1,43 @@
 const BaseController = require('./BaseController')
-const UserModel = require('../Models/UserModel')
+const {models:{accounts}} = require('../Models/index')
 class UserController extends BaseController{
     constructor(service){
         super(service)
     }
 
     async createAccountAsync(req,res){
-        let data = {
-            firstname: req.body.firstname,
-            name: req.body.name,
-            login: req.body.login,
-            roles: req.body.idRoles,
-            status: req.body.status,
-            password: req.body.password
+        let body = new accounts.bodies.Default(req.body)
+        let serviceResponse = await this._service.createUserAsync(req.repositories,body.toPrototype())
+        let responseBody = {}
+        if(serviceResponse.success){
+            responseBody = new accounts.responses.Default(serviceResponse.data).toPrototype()
+        }else{
+            responseBody = serviceResponse.error
         }
-        let serviceResponse = await this._service.createUserAsync(req.repositories,data)
-        return res.status(serviceResponse.statuscode).json(serviceResponse)
+        return res.status(serviceResponse.statuscode).json(responseBody)
     }
 
     async getAccountByIdAsync(req,res){
         let id = req.params.userId
         let serviceResponse = await this._service.getAccountByIdAsync(req.repositories.getUserRepository(), id,req.user)
-
-        return res.status(serviceResponse.statuscode).json(serviceResponse)
+        let value = {}
+        if(serviceResponse.success){
+            value = new accounts.responses.Default(serviceResponse.data).toPrototype()
+        }else{
+            value = serviceResponse.error
+        }
+        return this._sendResponse(res,serviceResponse.statuscode,value)
     }
 
     async updateAccountByIdAsync(req,res){
-        let data = {
-            idUser: req.params.userId,
-            firstname: req.body.firstname,
-            name: req.body.name,
-            password:req.body.password,
-            login: req.body.login,
-            status: req.body.status,
-            roles: req.body.roles
-        }
 
-        let serviceResponse = await this._service.updateAccountByIdAsync(req.repositories.getUserRepository(),data,req.params.userId,req.user)
+        let body = new accounts.bodies.Default(req.body)
+
+        let serviceResponse = await this._service.updateAccountByIdAsync(req.repositories.getUserRepository(),body.toPrototype(),req.params.userId,req.user)
         let value = {}
         
         if(serviceResponse.success){
-            value = new UserModel(serviceResponse.data).toPrototype()
+            value = new accounts.responses.Default(serviceResponse.data).toPrototype()
         }else{
             value = serviceResponse.error
         }

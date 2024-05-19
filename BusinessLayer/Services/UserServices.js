@@ -15,7 +15,7 @@ class UserServices{
         if(boResponse.success()){
             let repoRolesResponse = await repositories.getRoleRepository().existsRangeByIdsAsync(data.roles)
             if(repoRolesResponse.success){
-                let protoCreateUser = await bo.toCreateUser()
+                let protoCreateUser = bo.toCreateUser()
                 let repoUserResponse = await repositories.getUserRepository().createUserWithRolesAsync(protoCreateUser,data.roles)
                 if(repoUserResponse.success){
                     this._response.setData(repoUserResponse.data)
@@ -97,6 +97,8 @@ class UserServices{
         if(id.toLowerCase() === "me" && client.roles.isUser){
             data.idUser = client.id
             console.log(data.idUser)
+        }else if(client.roles.isUser){
+            data.idUser = id
         }
         console.log(data)
         let bo = new BoUser(data)

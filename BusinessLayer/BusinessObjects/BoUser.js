@@ -53,7 +53,6 @@ class BoUser{
             response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","les roles ne sont pas conforme")
             response.getError().setStatusCode(400)
         }
-
         return response
     }
 
@@ -150,7 +149,7 @@ class BoUser{
         return v4()
     }
 
-    async toCreateUser(){
+    toCreateUser(){
         return {
             idUser: this.#generateUuid(),
             firstnameUser:this.#firstname,
