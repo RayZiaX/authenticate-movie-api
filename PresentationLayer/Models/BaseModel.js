@@ -6,18 +6,23 @@ class BaseModel{
         this.#updatedAt = updatedAt
     }
 
-    toPrototype(){
-        let prototype = {}
+    _toPrototype(prototype){
+
+        let proto = {}
+
+        if(prototype != {} && prototype != undefined){
+            proto = prototype
+        }
 
         if(this.#createdAt != ''){
-            prototype.createdAt = this.#createdAt
+            proto.createdAt = this.#createdAt
         }
 
         if(this.#updatedAt != ''){
-            prototype.updatedAt = this.#updatedAt
+            proto.updatedAt = this.#updatedAt
         }
 
-        return prototype
+        return proto
     }
 }
 

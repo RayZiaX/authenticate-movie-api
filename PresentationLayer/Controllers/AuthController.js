@@ -1,24 +1,26 @@
 const BaseController = require("./BaseController")
-
+const {models:{tokens}} = require('../Models/index')
 class AuthController extends BaseController{
     constructor(service){
         super(service)
     }
 
     async loginUserAsync(req,res){
-        let data = {
-            login: req.body.login,
-            password: req.body.password
-        }
-        let serviceResponse = await this._service.loginAsync(req.repositories.getUserRepository(),data)
+        let requestBody = new tokens.bodies.Login(req.body)
+
+        let serviceResponse = await this._service.loginAsync(req.repositories.getUserRepository(),requestBody.toPrototype())
         const attempt = req.attemps[req.ip]
-        console.log(attempt)
+
         if(serviceResponse.success){
             attempt.count = 0
             attempt.lastAttempt = null
             attempt.blockedCount = 0
             attempt.blockedUntil = null
-            return res.status(serviceResponse.statuscode).json(serviceResponse.data)
+
+            console.log(serviceResponse.data)
+            let responseBody = new tokens.responses.RefreshToken(serviceResponse.data)
+            console.log(responseBody)
+            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
         }else{
             attempt.count += 1
             attempt.lastAttempt = Date.now()
@@ -46,7 +48,9 @@ class AuthController extends BaseController{
     async refreshToken(req,res){
         let serviceResponse = await this._service.refreshTokenAsync(req.params.refreshToken)
         if(serviceResponse.success){
-            return res.status(serviceResponse.statuscode).json(serviceResponse.data)
+            let responseBody = new tokens.responses.RefreshToken(serviceResponse.data)
+
+            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
 
         }else{
             return res.status(serviceResponse.statuscode).json(serviceResponse.error)
@@ -57,7 +61,8 @@ class AuthController extends BaseController{
         let serviceResponse = await this._service.validateToken(req.params.token)
 
         if(serviceResponse.success){
-            return res.status(serviceResponse.statuscode).json(serviceResponse.data)
+            let responseBody = new tokens.responses.BaseToken(serviceResponse.data)
+            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
 
         }else{
             return res.status(serviceResponse.statuscode).json(serviceResponse.error)
