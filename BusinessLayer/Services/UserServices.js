@@ -96,11 +96,9 @@ class UserServices{
 
         if(id.toLowerCase() === "me" && client.roles.isUser){
             data.idUser = client.id
-            console.log(data.idUser)
         }else if(client.roles.isUser){
             data.idUser = id
         }
-        console.log(data)
         let bo = new BoUser(data)
         let boResponse = bo.checkDatas()
         if(boResponse.success()){

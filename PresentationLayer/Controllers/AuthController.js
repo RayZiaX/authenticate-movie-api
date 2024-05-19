@@ -17,16 +17,13 @@ class AuthController extends BaseController{
             attempt.blockedCount = 0
             attempt.blockedUntil = null
 
-            console.log(serviceResponse.data)
             let responseBody = new tokens.responses.RefreshToken(serviceResponse.data)
-            console.log(responseBody)
             return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
         }else{
             attempt.count += 1
             attempt.lastAttempt = Date.now()
             if(attempt.count % process.env.BF_MAX_ATTEMPTS == 0){
                 attempt.blockedCount++
-                console.log(attempt)
                 let duration = 0
                 switch (attempt.blockedCount) {
                     case 1:
