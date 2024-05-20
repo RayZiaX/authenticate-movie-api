@@ -61,7 +61,7 @@ et ajoutez ceci:
 Exemple d'une réponse réussi: </br>
 ```
 {
-    "idUser": "98882c83-6f14-4355-add4-b8ddf4936786",
+    "idAccount": "98882c83-6f14-4355-add4-b8ddf4936786",
     "login": "MSU22",
     "roles": [
         {
@@ -92,7 +92,7 @@ Cette route possède plusieurs sécurités/vérifications comme:</br>
 Exemple d'une réponse réussi: </br>
 ```
 {
-    "idUser": "32fc8d3a-2bf6-4d54-b54a-7f894bbbc60c",
+    "idAccount": "32fc8d3a-2bf6-4d54-b54a-7f894bbbc60c",
     "login": "root",
     "roles": [
         {
@@ -139,7 +139,7 @@ et ajoutez ceci: </br>
 Exemple d'une réponse réussi: </br>
 ```
 {
-    "idUser": "98882c83-6f14-4355-add4-b8ddf4936786",
+    "idAccount": "98882c83-6f14-4355-add4-b8ddf4936786",
     "login": "MSU22",
     "roles": [
         {
