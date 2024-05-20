@@ -111,14 +111,15 @@ Exemple d'une réponse réussi: </br>
 
 ### /api/account/<uid>
 
-Elle permet de consulter son compte.</br>
+Elle permet de modifier les information d'un ou son compte.</br>
 Elle possède plusieurs sécurités/vérifications comme:</br>
-- Il faut être obligatoirement connecté pour consulter son compte.
+- L'utilisateur doit être obligatoirement connecté pour consulter son compte.
 - Seulement un compte Administrateur peut consulter l'ensemble des comptes.
 - Si dans au niveau du `uid` la valeur est `me` alors les données de l'utilisateur connecter sera retourné.
 - Si l'utilisateur connecté est un `Gest` alors toute tentative de consultation sera annulée
 - Si l'utilisateur connecté est un administateur alors il peut modifier n'importe quel compte et attribuer un ou plusieurs rôles
 - Si l'utilisateur connecté est un simple utilisateur alors il peut uniquement modifier les informations de son compte et ne peut modifier aucun rôles
+- Le compte administateur propriétaire de son compte ne peux pas modifier ses droits (une sécurité afin qu'il ne se supprime pas ses droits)
 
 #### Comment utiliser cette route ?
 - Créer une nouvelle requête http avec comme méthode `PUT`
@@ -202,7 +203,7 @@ Une réponse si la connexion à bien fonctionnée:</br>
 Cette route permet de vérifier la validité du token (jeton) passé en paramètre.</br>
 
 #### Comment utiliser cette route ?
-- Créer une nouvelle requête http avec comme méthode `POST`
+- Créer une nouvelle requête http avec comme méthode `GET`
 - Remplacer le `token` par le token à vérifier.
 
 #### Exemple de réponse
