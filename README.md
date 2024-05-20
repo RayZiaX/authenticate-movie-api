@@ -51,8 +51,6 @@ Dans postman:
 et ajoutez ceci:
 ```
 {
-    "firstname":"string",
-    "name":"string",
     "login":"string",
     "password":"string",
     "roles":["string"],
@@ -64,8 +62,6 @@ Exemple d'une réponse réussi: </br>
 ```
 {
     "idUser": "98882c83-6f14-4355-add4-b8ddf4936786",
-    "firstname": "tota",
-    "name": "tato",
     "login": "MSU22",
     "roles": [
         {
@@ -97,8 +93,6 @@ Exemple d'une réponse réussi: </br>
 ```
 {
     "idUser": "32fc8d3a-2bf6-4d54-b54a-7f894bbbc60c",
-    "firstname": "root",
-    "name": "root",
     "login": "root",
     "roles": [
         {
@@ -134,8 +128,6 @@ Elle possède plusieurs sécurités/vérifications comme:</br>
 et ajoutez ceci: </br>
 ```
 {
-    "firstname":"string",
-    "name":"string",
     "login":"string",
     "password":"string",
     "roles":["string"],
@@ -147,8 +139,6 @@ Exemple d'une réponse réussi: </br>
 ```
 {
     "idUser": "98882c83-6f14-4355-add4-b8ddf4936786",
-    "firstname": "tota",
-    "name": "tato",
     "login": "MSU22",
     "roles": [
         {
@@ -173,8 +163,7 @@ et ajoutez ceci: </br>
 ```
 {
     "login":"string",
-    "password":"string",
-    "from":"string"
+    "password":"string"
 }
 ```
 
