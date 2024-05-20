@@ -16,6 +16,7 @@ module.exports = {
                 BaseToken: require('./Tokens/Responses/BaseTokenResponse'),
                 RefreshToken: require('./Tokens/Responses/RefreshTokenResponse')
             }
-        }
+        },
+        Error: require('./ErrorModel')
     }
 }

@@ -1,24 +1,24 @@
 const BaseController = require("./BaseController")
-const {models:{tokens}} = require('../Models/index')
+const {models:{tokens},models:{Error}} = require('../Models/index')
 class AuthController extends BaseController{
     constructor(service){
         super(service)
     }
 
-    async loginUserAsync(req,res){
+    async loginAccountAsync(req,res){
         let requestBody = new tokens.bodies.Login(req.body)
 
-        let serviceResponse = await this._service.loginAsync(req.repositories.getUserRepository(),requestBody.toPrototype())
+        let serviceResponse = await this._service.loginAsync(req.repositories.getAccountRepository(),requestBody.toPrototype())
         const attempt = req.attemps[req.ip]
-
+        let responseBody = {}
+        let statuscode = 200
         if(serviceResponse.success){
             attempt.count = 0
             attempt.lastAttempt = null
             attempt.blockedCount = 0
             attempt.blockedUntil = null
-
-            let responseBody = new tokens.responses.RefreshToken(serviceResponse.data)
-            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
+            statuscode = 201
+            responseBody = new tokens.responses.RefreshToken(serviceResponse.data).toPrototype()
         }else{
             attempt.count += 1
             attempt.lastAttempt = Date.now()
@@ -38,32 +38,39 @@ class AuthController extends BaseController{
                 }
                 attempt.blockedUntil = Date.now() + duration
             }
-            return res.status(serviceResponse.statuscode).json(serviceResponse.error)
+            statuscode = 404
+            responseBody = new Error(serviceResponse.error.message).toPrototype()
         }
+
+        return this._sendResponse(res,statuscode,responseBody)
     }
 
     async refreshToken(req,res){
         let serviceResponse = await this._service.refreshTokenAsync(req.params.refreshToken)
+        let responseBody = {}
+        let statuscode = 200
         if(serviceResponse.success){
-            let responseBody = new tokens.responses.RefreshToken(serviceResponse.data)
-
-            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
-
+            statuscode = 200
+            responseBody = new tokens.responses.RefreshToken(serviceResponse.data).toPrototype()
         }else{
-            return res.status(serviceResponse.statuscode).json(serviceResponse.error)
+            statuscode = 404
+            responseBody = new Error(serviceResponse.error.message).toPrototype()
         }
+        return this._sendResponse(res,statuscode,responseBody)
     }
 
     async accessToken(req,res){
         let serviceResponse = await this._service.validateToken(req.params.token)
-
+        let responseBody = {}
+        let statuscode = 200
         if(serviceResponse.success){
-            let responseBody = new tokens.responses.BaseToken(serviceResponse.data)
-            return res.status(serviceResponse.statuscode).json(responseBody.toPrototype())
-
+            statuscode = 200
+            responseBody = new tokens.responses.RefreshToken(serviceResponse.data).toPrototype()
         }else{
-            return res.status(serviceResponse.statuscode).json(serviceResponse.error)
+            statuscode = 404
+            responseBody = new Error(serviceResponse.error.message).toPrototype()
         }
+        return this._sendResponse(res,statuscode,responseBody)
     }
 }
 

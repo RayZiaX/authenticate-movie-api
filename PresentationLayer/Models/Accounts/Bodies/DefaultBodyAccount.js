@@ -1,16 +1,12 @@
 const BaseModel = require("../../BaseModel");
 
 class DefaultBodyAccount extends BaseModel{
-    #name;
-    #firstname;
     #login;
     #password;
     #roles;
     #status;
-    constructor({name = "",firstname = "",login = "", password = "", roles = "", status = ""}){
+    constructor({login = "", password = "", roles = "", status = ""}){
         super("","")
-        this.#firstname = firstname
-        this.#name = name
         this.#login = login
         this.#password = password
         this.#roles = roles
@@ -19,13 +15,6 @@ class DefaultBodyAccount extends BaseModel{
 
     toPrototype(){
         let prototype = {}
-        if(this.#firstname != undefined && this.#firstname != ""){
-            prototype.firstname = this.#firstname
-        }
-        
-        if(this.#name != undefined && this.#name != ""){
-            prototype.name = this.#name
-        }
         
         if(this.#login != undefined && this.#login != ""){
             prototype.login = this.#login

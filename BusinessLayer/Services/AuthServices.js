@@ -1,4 +1,4 @@
-const BoUser = require('../BusinessObjects/BoUser');
+const {businessObjects:{BoAccount}} = require('../BusinessObjects/index');
 const ServiceResponse = require('./Responses/ServiceResponse')
 const jwt = require('jsonwebtoken');
 class AuthServices{
@@ -7,7 +7,7 @@ class AuthServices{
         this._response = new ServiceResponse()
     }
 
-    async loginAsync(userRepo, {login = "", password = ""}){
+    async loginAsync(accountRepo, {login = "", password = ""}){
         this._response = new ServiceResponse()
         if((login == undefined || login == null) || (password == undefined || password == null)){
             this._response.getError().setErrorMessage('Login ou mots de passe non valide','le login est null ou undefined')
@@ -21,9 +21,9 @@ class AuthServices{
             return this._response.toPrototype()
         }
 
-        let repoResponse = await userRepo.getUserRolesByCriteriaAsync({loginUser:login,passwordUser:password},false)
+        let repoResponse = await accountRepo.getAccountRolesByCriteriaAsync({loginAccount:login,passwordAccount:password},false)
         if(repoResponse.success){
-            this._response.setData(this.#generateTokenAsync({idUser: repoResponse.data.idUser, roles: repoResponse.data.roles}))
+            this._response.setData(this.#generateTokenAsync({idAccount: repoResponse.data.idAccount, roles: repoResponse.data.roles}))
             return this._response.toPrototype()
         }else{
             if(process.env.ENV.toLocaleLowerCase() == "dev"){
@@ -82,17 +82,17 @@ class AuthServices{
                 this._response.getError().setErrorMessage("token invalide", err)
                 this._response.getError().setStatusCode(403)
             }else{
-                this._response.setData(this.#generateTokenAsync({idUser:decoded.idUser,roles: decoded.roles}))
+                this._response.setData(this.#generateTokenAsync({idAccount:decoded.idAccount,roles: decoded.roles}))
             }
         })
         return this._response.toPrototype()
     }
     
-    #generateTokenAsync({idUser,roles}){
+    #generateTokenAsync({idAccount,roles}){
         return {
-            accessToken: jwt.sign({idUser:idUser, roles:roles}, process.env.JWT_KEY, {expiresIn:(process.env.JWT_EXPIRE+"m")}),
+            accessToken: jwt.sign({idAccount:idAccount, roles:roles}, process.env.JWT_KEY, {expiresIn:(process.env.JWT_EXPIRE+"m")}),
             accessTokenExpireAt: new Date(Date.now() + process.env.JWT_EXPIRE * 60 * 1000).toISOString(),
-            refreshToken: jwt.sign({idUser:idUser, roles:roles}, process.env.JWT_REFRESH_KEY, {expiresIn:(process.env.JWT_REFRESH_EXPIRE+"m")}),
+            refreshToken: jwt.sign({idAccount:idAccount, roles:roles}, process.env.JWT_REFRESH_KEY, {expiresIn:(process.env.JWT_REFRESH_EXPIRE+"m")}),
             refreshTokenExpireAt: new Date(Date.now() + process.env.JWT_REFRESH_EXPIRE * 60 * 1000).toISOString()
         }
     }

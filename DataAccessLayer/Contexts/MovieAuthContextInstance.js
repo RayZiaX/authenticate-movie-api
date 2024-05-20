@@ -27,16 +27,16 @@ const instance = new MovieAuthContext(dbName,dbUsername,dbPassword,new DbOption(
 instance.sync()
 .then(async () => {
     if(canInjectDatas){
-        let idUser = v4()
+        let idAccount = v4()
         await instance.getRoles().bulkCreate([
             {nameRole:"Admin",actif:true},
             {nameRole:"User",actif:true},
             {nameRole:"Gest",actif:true},
         ])
-        await instance.getUsers().create({idUser:idUser,nameUser:'root',firstnameUser:'root',loginUser:'root',passwordUser:'root',status:'open'})
-        await instance.getUsersRoles().bulkCreate([
-            {idUser:idUser,idRole:2},
-            {idUser:idUser,idRole:1},
+        await instance.getAccounts().create({idAccount:idAccount,loginAccount:'root',passwordAccount:'root',status:'open'})
+        await instance.getAccountsRoles().bulkCreate([
+            {idAccount:idAccount,idRole:2},
+            {idAccount:idAccount,idRole:1},
         ])
     }
 })

@@ -1,21 +1,17 @@
 const { v4 } = require('uuid');
 const BoResponse = require('./BoResponses/BoResponse');
 const bcrypt = require('bcryptjs')
-class BoUser{
-    #firstname;
-    #name;
+class BoAccount{
     #login;
     #password;
     #id;
     #status;
     #roles
 
-    constructor({idUser ="", firstname = "", name = "", login = "", password = "", status="open", roles = null}){
-        this.#firstname = firstname
-        this.#name = name
+    constructor({idAccount ="", login = "", password = "", status="open", roles = null}){
         this.#login = login
         this.#password = password
-        this.#id = idUser
+        this.#id = idAccount
         this.#status = status
         this.#roles = roles
     }
@@ -24,33 +20,23 @@ class BoUser{
     checkDatasToInsert(){
         let response = new BoResponse();
 
-        if(!this.checkName().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","Le nom n'est pas conforme")
-            response.getError().setStatusCode(400)
-        }
-
-        if(!this.checkFirstname().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
-            response.getError().setStatusCode(400)
-        }
-
         if(!this.checkLogin().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le login n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le login n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkPassword().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le mot de passe n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le mot de passe n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkStatus().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le status n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le status n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkRoles().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","les roles ne sont pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","les roles ne sont pas conforme")
             response.getError().setStatusCode(400)
         }
         return response
@@ -59,61 +45,35 @@ class BoUser{
     checkDatas(){
         let response = new BoResponse();
         if(!this.checkId().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","l'identifiant n'est pas conforme")
-            response.getError().setStatusCode(400)
-        }
-
-        if(!this.checkName().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le nom n'est pas conforme")
-            response.getError().setStatusCode(400)
-        }
-
-        if(!this.checkFirstname().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","l'identifiant n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkPassword().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le prénom n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le mot de passe n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkLogin().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le login n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le login n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkStatus().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","le status n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","le status n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         if(!this.checkRoles().success()){
-            response.getError().setErrorMessage("les données de l'utilisateur ne sont pas conforme","les roles n'est pas conforme")
+            response.getError().setErrorMessage("les données du compte ne sont pas conforme","les roles n'est pas conforme")
             response.getError().setStatusCode(400)
         }
 
         return response
     }
-
-    /**
-     * Méthode qui permet d'appliquer les règles métier de conformité pour l'objet métier à sa propriété name
-     * @returns une réponse de type BoResponse qui valide ou non la vérification
-     */
-    checkName() {
-        return BoUser.checkName(this.#name)
-    }
     
     checkStatus(){
-        return BoUser.checkStatus(this.#status)
-    }
-
-    /**
-     * Méthode qui permet d'appliquer les règles métier de conformité pour l'objet métier à sa propriété firstname
-     * @returns une réponse de type BoResponse qui valide ou non la vérification
-     */
-    checkFirstname(){
-        return BoUser.checkFirstname(this.#firstname)
+        return BoAccount.checkStatus(this.#status)
     }
     
     /**
@@ -121,19 +81,19 @@ class BoUser{
      * @returns une réponse de type BoResponse qui valide ou non la vérification
      */
     checkLogin(){
-        return BoUser.checkLogin(this.#login)
+        return BoAccount.checkLogin(this.#login)
     }
 
     checkId(){
-        return BoUser.checkId(this.#id)
+        return BoAccount.checkId(this.#id)
     }
 
     checkPassword(){
-        return BoUser.checkPassword(this.#password)
+        return BoAccount.checkPassword(this.#password)
     }
 
     checkRoles(){
-        return BoUser.checkRoles(this.#roles)
+        return BoAccount.checkRoles(this.#roles)
     }
 
 //#endregion
@@ -149,13 +109,11 @@ class BoUser{
         return v4()
     }
 
-    toCreateUser(){
+    toCreateAccount(){
         return {
-            idUser: this.#generateUuid(),
-            firstnameUser:this.#firstname,
-            nameUser:this.#name,
-            loginUser:this.#login,
-            passwordUser: this.#password,
+            idAccount: this.#generateUuid(),
+            loginAccount:this.#login,
+            passwordAccount: this.#password,
             status: this.#status ? this.#status : "open"
         }
     }
@@ -163,9 +121,8 @@ class BoUser{
     toPrototype(){
         let prototype = {
            id: this.#id,
-           firstname: this.#firstname,
-           lastname: this.#name,
            login: this.#login,
+           password: this.#password,
            status: this.#status,
            roles: this.#roles
         }
@@ -174,36 +131,6 @@ class BoUser{
     }
 
     //#region méthode statique
-
-    /**
-     * Méthode static qui applique les règles métier de conformité pour le nom du détenteur de ce compte
-     * @param {le nom de l'utilisateur détenant ce compte} name 
-     * @returns une réponse de type BoResponse qui valide ou non la vérification
-     */
-    static checkName(name){
-        let response = new BoResponse()
-        if(name == null || name == undefined || typeof(name) !== 'string' || name == ""){
-            response.getError().setErrorMessage("le nom du compte n'est pas au bon format")
-            response.getError().setStatusCode(400)
-            return response
-        }
-        return response
-    }
-
-    /**
-     * Méthode static qui applique les règles métier de conformité pour le prénom du détenteur de ce compte
-     * @param {le prénom de l'utilisateur détenant ce compte} firstname 
-     * @returns une réponse de type BoResponse qui valide ou non la vérification
-     */
-    static checkFirstname(firstname){
-        let response = new BoResponse()
-        if(firstname == null || firstname == undefined|| typeof(firstname) !== 'string'  || firstname == ""){
-            response.getError().setErrorMessage("le prénom du compte n'est pas valide")
-            response.getError().setStatusCode(400)
-            return response 
-        }
-        return response
-    }
 
     /**
      * Méthode qui applique les règles métier de conformité pour le login du compte utilisateur
@@ -318,4 +245,4 @@ class BoUser{
     //#endregion
 }
 
-module.exports = BoUser
+module.exports = BoAccount

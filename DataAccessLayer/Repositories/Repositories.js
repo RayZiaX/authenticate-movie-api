@@ -1,19 +1,19 @@
 const repositories = require('./index')
 
 class Repositories {
-    #userRepository;
+    #accountRepository;
     #roleRepository;
 
     constructor(context) {
         this.context = context
     }
 
-    getUserRepository(){
-        if(this.#userRepository == null || this.#userRepository == undefined){
-            this.#userRepository = new repositories.Repositories.UserRepository(this.context, this.context.getUsers())
+    getAccountRepository(){
+        if(this.#accountRepository == null || this.#accountRepository == undefined){
+            this.#accountRepository = new repositories.Repositories.AccountRepository(this.context, this.context.getAccounts())
         }
 
-        return this.#userRepository;
+        return this.#accountRepository;
     }
 
     getRoleRepository(){

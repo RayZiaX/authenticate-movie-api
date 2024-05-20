@@ -1,6 +1,6 @@
 module.exports = {
     controllers:{
-        User: require('./UserController'),
+        Account: require('./AccountController'),
         Authentication: require('./AuthController')
     }
 }

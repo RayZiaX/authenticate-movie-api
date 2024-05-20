@@ -1,7 +1,7 @@
 
 module.exports = {
     Repositories:{
-        UserRepository: require("./UserRepository"),
+        AccountRepository: require("./AccountRepository"),
         RoleRepository: require("./RoleRepository")
     }
 }
