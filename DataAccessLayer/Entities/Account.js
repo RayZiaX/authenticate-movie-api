@@ -1,46 +1,36 @@
 const { DataTypes, Model } = require('sequelize')
 const Role = require("./Role")
-class User extends Model{}
+class Account extends Model{}
 
 module.exports = (context) => {
-    return User.init({
-        idUser:{
+    return Account.init({
+        idAccount:{
             type: DataTypes.UUIDV4,
             primaryKey: true,
             autoIncrement:false,
             allowNull: false,
             unique:true,
-            field: "id_user"
+            field: "id_account"
         },
-        nameUser:{
-            type:DataTypes.STRING,
-            allowNull: false,
-            field: "name_user"
-        },
-        firstnameUser:{
+        loginAccount:{
             type: DataTypes.STRING,
             allowNull: false,
-            field: "firstname_user"
+            field: "login_account"
         },
-        loginUser:{
+        passwordAccount:{
             type: DataTypes.STRING,
             allowNull: false,
-            field: "login_user"
-        },
-        passwordUser:{
-            type: DataTypes.STRING,
-            allowNull: false,
-            field: "pwd_user"
+            field: "pwd_account"
         },
         status:{
             type: DataTypes.STRING,
             allowNull: false,
-            field: "status_user"
+            field: "status_account"
         }
     },{
         sequelize: context,
-        modelName: "user",
-        tableName: "users",
+        modelName: "account",
+        tableName: "accounts",
         createdAt: true,
         updatedAt: true
     })

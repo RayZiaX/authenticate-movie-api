@@ -1,20 +1,20 @@
 const BaseRepository = require('./BaseRepository')
 const ResponseRepository = require('./Responses/ResponseRepository')
 
-class UserRepository extends BaseRepository{
+class AccountRepository extends BaseRepository{
     constructor(context,entity){
-        super(context,entity,"user")
+        super(context,entity,"account")
     }
 
-    async createUserWithRolesAsync(value,idRoles){
+    async createAccountWithRolesAsync(value,idRoles){
         let response = new ResponseRepository()
         try {
             let result = await this.createAsync(value,false)
             if(result.success){
                 await Promise.all(idRoles.map(roleId => {
-                    return this.context.getUsersRoles().create({idUser: result.data.idUser,idRole:roleId})
+                    return this.context.getAccountsRoles().create({idAccount: result.data.idAccount,idRole:roleId})
                 }))
-                result = await this.getUserRolesbyPkAsync(result.data.idUser,false)
+                result = await this.getAccountRolesbyPkAsync(result.data.idAccount,false)
 
                 if(result.success){
                     response.setData(result.data)
@@ -33,7 +33,7 @@ class UserRepository extends BaseRepository{
         return this._sendResponse(response)
     }
 
-    async getUserRolesbyPkAsync(primaryKey,track = false){
+    async getAccountRolesbyPkAsync(primaryKey,track = false){
         let response = new ResponseRepository()
         try {
             let options= {
@@ -61,12 +61,12 @@ class UserRepository extends BaseRepository{
         return this._sendResponse(response)
     }
 
-    async getUserRolesByCriteriaAsync(criteria, track = false){
+    async getAccountRolesByCriteriaAsync(criteria, track = false){
         let response = new ResponseRepository()
         try {
             let result = await this.entity.findOne({where:criteria})
             if(result != null){
-                result = await this.getUserRolesbyPkAsync(result.idUser,track)
+                result = await this.getAccountRolesbyPkAsync(result.idAccount,track)
                 if(result.success){
                     response.setData(result.data)
                 }else{
@@ -84,28 +84,33 @@ class UserRepository extends BaseRepository{
         return this._sendResponse(response)
     }
 
-    async updateUserAsync({firstname,lastname,login,status}, roles,primaryKey,changeRoles = false, track=false){
+    async updateAccountAsync({login,password,status}, roles,primaryKey,changeRoles = false, track=false){
         let response = new ResponseRepository()
         try {
             let oldEntity = await this.getByPrimaryKeyAsync(primaryKey,undefined,true)
             if(oldEntity.success){
                 oldEntity = oldEntity.data
-                oldEntity.nameUser = firstname
-                oldEntity.firstnameUser = lastname
-                oldEntity.loginUser = login
-                oldEntity.status = status
+                if(login != undefined){
+                    oldEntity.loginAccount = login
+                }
+                if(password != undefined){
+                    oldEntity.passwordAccount = password
+                }
+                if(status != undefined){
+                    oldEntity.status = status
+                }
 
                 await oldEntity.save()
                 
                 if(changeRoles && (roles != undefined && Array.isArray(roles))){
-                    await this.context.getUsersRoles().destroy({where: {idUser: primaryKey}})
+                    await this.context.getAccountsRoles().destroy({where: {idAccount: primaryKey}})
 
                     await Promise.all(roles.map(roleId => {
-                        return this.context.getUsersRoles().create({idUser: primaryKey,idRole: roleId})
+                        return this.context.getAccountsRoles().create({idAccount: primaryKey,idRole: roleId})
                     }))
                 }
 
-                let changeEntity = await this.getUserRolesbyPkAsync(primaryKey,track)
+                let changeEntity = await this.getAccountRolesbyPkAsync(primaryKey,track)
                 if(changeEntity.success){
                     response.setData(changeEntity.data)
                 }else{
@@ -124,4 +129,4 @@ class UserRepository extends BaseRepository{
     }
 }
 
-module.exports = UserRepository
+module.exports = AccountRepository

@@ -32,9 +32,9 @@ class DbOption{
 
 
 class MovieAuthContext extends Sequelize{
-    #users;
+    #accounts;
     #roles;
-    #usersRoles;
+    #accountsRoles;
 
     constructor(dbName, userName, password, dbOptions = {}){
         if(!(dbOptions instanceof DbOption)){
@@ -44,38 +44,38 @@ class MovieAuthContext extends Sequelize{
         this.#onModelCreating()
     }
 
-    getUsers(){
-        return this.#users
+    getAccounts(){
+        return this.#accounts
     }
 
     getRoles(){
         return this.#roles
     }
 
-    getUsersRoles(){
-        return this.#usersRoles
+    getAccountsRoles(){
+        return this.#accountsRoles
     }
 
     #onModelCreating(){
-        this.#users = Entities.User(this)
+        this.#accounts = Entities.Account(this)
         this.#roles = Entities.Role(this)
-        this.#usersRoles = Entities.UserRole(this)
+        this.#accountsRoles = Entities.AccountRole(this)
 
         this.#onModelConfiguring()
     }
 
     #onModelConfiguring(){
-        this.#users.belongsToMany(this.#roles,{
+        this.#accounts.belongsToMany(this.#roles,{
             as: "roles",
-            through: "users_roles",
-            foreignKey: "id_user",
+            through: "accounts_roles",
+            foreignKey: "id_account",
             otherKey: "id_role"
         })
-        this.#roles.belongsToMany(this.#users, {
-            as: "users",
-            through: "users_roles",
+        this.#roles.belongsToMany(this.#accounts, {
+            as: "accounts",
+            through: "accounts_roles",
             foreignKey: "id_role",
-            otherKey: "id_user"
+            otherKey: "id_account"
         })
     }
 }

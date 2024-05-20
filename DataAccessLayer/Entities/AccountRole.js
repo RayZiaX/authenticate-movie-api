@@ -1,16 +1,16 @@
 const { DataTypes, Model } = require('sequelize')
 
-class UserRole extends Model{}
+class AccountRole extends Model{}
 
 module.exports = (context) => {
-    return UserRole.init({
-        idUser: {
+    return AccountRole.init({
+        idAccount: {
             type: DataTypes.UUIDV4,
             references:{
-                model: "user",
-                key: "id_user"
+                model: "account",
+                key: "id_account"
             },
-            field:"id_user",
+            field:"id_account",
             primaryKey: true
         },
         idRole:{
@@ -24,8 +24,8 @@ module.exports = (context) => {
         }
     },{
         sequelize: context,
-        modelName: "userRole",
-        tableName: "users_roles",
+        modelName: "accountRole",
+        tableName: "accounts_roles",
         createdAt: true,
         updatedAt: true
     })

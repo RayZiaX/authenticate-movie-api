@@ -10,7 +10,7 @@ function preventBrutforce(req,res,next){
 
     if (attempt.blockedUntil && Date.now() < attempt.blockedUntil) {
         let duration = new Date(attempt.blockedUntil - Date.now())
-        return res.status(429).send(`Trop de tentatives de connexion, réessayez dans ${duration.getMinutes()} minutes et ${duration.getSeconds()} seconde.`);
+        return res.status(429).send({message:`Trop de tentatives de connexion, réessayez dans ${duration.getMinutes()} minutes et ${duration.getSeconds()} seconde.`});
     }
     req.attemps = loginAttempts
     next()

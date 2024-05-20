@@ -1,5 +1,5 @@
 module.exports ={
     businessObjects:{
-        BoUser : require('./BoUser')
+        BoAccount : require('./BoAccount')
     }
 }
